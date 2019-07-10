@@ -6,18 +6,50 @@ export class Page extends React.Component {
     const year = +e.currentTarget.innerText
     this.props.getPhotos(year)
   }
+
+  renderButtons = () => {
+    const years = [2019, 2018, 2017, 2016, 2015]
+
+    return years.map( (item, index) => {
+      return (
+        <button key={index} className="btn" onClick={this.onBtnClick}>
+          {item}{` `}
+        </button>
+      )
+    })
+  }
+
+  renderTempate = () => {
+    const { photos, isFetching, error } = this.props
+
+    if (error) { 
+      return <p className="error">Во время загрузки фото произошла ошибка</p>
+    }
+
+    if (isFetching) {
+      return <p>Загрузка...</p>
+    } else {
+      return photos.map(entry => (
+        <div key={entry.id} className="photo">
+          <p>
+            <img src={entry.sizes[0].url} alt="" />
+          </p>
+          <p>{entry.likes.count} ❤</p>
+        </div>
+      ))
+    }
+  }
   render() {
-    const { year, photos, isFetching } = this.props
+    const { year, photos } = this.props
     return (
       <div className="ib page">
         <div>
-          <button className="btn" onClick={this.onBtnClick}>2018</button>{' '}
-          <button className="btn" onClick={this.onBtnClick}>2017</button>{' '}
-          <button className="btn" onClick={this.onBtnClick}>2016</button>{' '}
-          <button className="btn" onClick={this.onBtnClick}>2015</button>{' '}
-          <button className="btn" onClick={this.onBtnClick}>2014</button>{' '}
+          {this.renderButtons()}
         </div>
-        {isFetching ? <p>Загрузка...</p> : <p>У тебя {photos.length} фото за {year} год</p>}
+        <h3>
+          {year} год [{photos.length}]
+        </h3>
+        {this.renderTempate()}
       </div>
     )
   }
@@ -28,4 +60,5 @@ Page.propTypes = {
   photos: PropTypes.array.isRequired,
   getPhotos: PropTypes.func.isRequired,
   isFetching: PropTypes.bool.isRequired,
+  error: PropTypes.string,
 }
